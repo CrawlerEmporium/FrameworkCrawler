@@ -3,13 +3,9 @@ import datetime
 import discord
 import time
 
-from discord import VerificationLevel as VL
-from discord import VoiceRegion as VR
-from math import floor
-
 import utils.globals as GG
 from discord.ext import commands
-from utils import logger
+from utils import logger, embeds
 
 log = logger.logger
 
@@ -53,25 +49,22 @@ class Info(commands.Cog):
                      value='A multipurpose bot made by LordDusk#0001 .\n[Support Server](https://discord.gg/HEY6BWj)')
         em.set_footer(text=f"<>Crawler {ctx.bot.version} | Powered by discord.py")
         await ctx.send(embed=em)
-        await GG.upCommand("botinfo")
 
     @commands.command()
     async def support(self, ctx):
-        em = GG.EmbedWithAuthor(ctx)
+        em = embeds.EmbedWithAuthor(ctx)
         em.title = 'Support Server'
         em.description = "So you want support for <>Crawler? You can easily join my discord [here](https://discord.gg/HEY6BWj).\n" \
                          "This server allows you to ask questions about the bot. Do feature requests, and talk with other bot users!\n\n" \
                          "If you want to somehow support my developer, you can buy me a cup of coffee (or 2) [here](https://ko-fi.com/5ecrawler)"
         await ctx.send(embed=em)
-        await GG.upCommand("support")
 
     @commands.command()
     async def invite(self, ctx):
-        em = GG.EmbedWithAuthor(ctx)
+        em = embeds.EmbedWithAuthor(ctx)
         em.title = 'Invite Me!'
         em.description = "Hi, you can easily invite me to your own server by following [this link]()!\n\n"
         await ctx.send(embed=em)
-        await GG.upCommand("invite")
 
 
 def setup(bot):

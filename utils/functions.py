@@ -2,6 +2,8 @@ import logging
 import random
 import re
 
+import discord
+
 log = logging.getLogger(__name__)
 
 
@@ -9,15 +11,35 @@ class SearchException(Exception):
     pass
 
 
-def discord_trim(string):
-    result = []
-    trimLen = 0
-    lastLen = 0
-    while trimLen <= len(string):
-        trimLen += 1999
-        result.append(string[lastLen:trimLen])
-        lastLen += 1999
-    return result
+async def splitDiscordEmbedField(embed, input, embed_field_name):
+    texts = []
+    while len(input) > 1024:
+        next_text = input[:1024]
+        last_space = next_text.rfind(" ")
+        input = "…" + input[last_space + 1:]
+        next_text = next_text[:last_space] + "…"
+        texts.append(next_text)
+    texts.append(input)
+    embed.add_field(name=embed_field_name, value=texts[0], inline=False)
+    for piece in texts[1:]:
+        embed.add_field(name="** **", value=piece, inline=False)
+
+
+async def safeEmbed(embed_queue, title, desc, color):
+    if len(desc) < 1024:
+        embed_queue[-1].add_field(name=title, value=desc, inline=False)
+    elif len(desc) < 4096:
+        embed = discord.Embed(colour=color, title=title)
+        await splitDiscordEmbedField(embed, desc, title)
+        embed_queue.append(embed)
+    else:
+        embed_queue.append(discord.Embed(colour=color, title=title))
+        trait_all = [desc[i:i + 4080] for i in range(0, len(desc), 4080)]
+        embed_queue[-1].description = trait_all[0]
+        for t in trait_all[1:]:
+            embed = discord.Embed(colour=color)
+            await splitDiscordEmbedField(embed, t, "** **")
+            embed_queue.append(embed)
 
 
 def gen_error_message():
